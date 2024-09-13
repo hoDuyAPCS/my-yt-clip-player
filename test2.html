@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Playlist</title>
+</head>
+<body>
+    <h1>Welcome to My Video Playlist</h1>
+    <div id="player"></div>
+
+    <script>
+        // Load the IFrame Player API code asynchronously.
+        console.log('Loading YouTube IFrame API...');
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var videos = [];
+        var currentIndex = 0;
+
+
+        function onYouTubeIframeAPIReady() {
+            console.log('YouTube IFrame API is ready.');
+            // Load video data from text file
+            fetch('video_data.txt')
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Video data loaded:', data);
+                    videos = parseVideoData(data);
+                    console.log('Parsed video data:', videos);
+                    playNextVideo();
+                })
+                .catch(error => console.error('Error loading video data:', error));
+        }
+
+        function parseVideoData(data) {
+            console.log('Parsing video data...');
+            return data.trim().split('\n').map(line => {
+                const [url, start, duration] = line.split(',');
+                const videoId = new URL(url).searchParams.get('v');
+                return { 
+                    id: videoId, 
+                    start: parseInt(start), 
+                    end: parseInt(start) + parseInt(duration) 
+                };
+            });
+        }
+
+        function playNextVideo() {
+            if (currentIndex >= videos.length) {
+                console.log('All videos have been played.');
+                return; // No more videos to play
+            }
+
+            const video = videos[currentIndex];
+            console.log('Playing video:', video);
+            videoEnded = false; // Reset the flag before playing the next video
+            videoLoaded = false; // Reset the loaded flag before playing the next video
+
+            if (!player) {
+                // Initialize player if not already initialized
+                player = new YT.Player('player', {
+                    height: '315',
+                    width: '560',
+                    videoId: video.id,
+                    playerVars: {
+                        'start': video.start,
+                        'end': video.end,
+                        'autoplay': 1,
+                        'controls': 1
+                    },
+                    events: {
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            } else {
+                // Load next video in the existing player
+                player.loadVideoById({
+                    videoId: video.id,
+                    startSeconds: video.start,
+                    endSeconds: video.end
+                });
+            }
+        }
+
+        function onPlayerStateChange(event) {
+            console.log('Player state changed:', event.data);
+
+    
+
+            if (event.data == YT.PlayerState.ENDED) {
+                console.log('Video ended, moving to next video.');
+                videoEnded = true; // Set flag to indicate video has ended
+                currentIndex++;
+                playNextVideo();
+            }
+        }
+    </script>
+</body>
+</html>
