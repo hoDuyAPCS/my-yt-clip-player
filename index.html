@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Autoplay and Switch</title>
+</head>
+
+<body>
+    <div id="player"></div>
+
+    <script>
+        // Load the IFrame Player API code asynchronously.
+        console.log('Loading YouTube IFrame API...');
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var videoList = [];
+        var currentIndex = 0;
+
+        function onYouTubeIframeAPIReady() {
+            console.log('YouTube IFrame API is ready.');
+            // Load video data from text file
+            fetch('video_data.txt')
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Video data loaded:', data);
+                    videoList = parseVideoData(data);
+                    console.log('Parsed video data:', videoList);
+                    playNextVideo();
+                })
+                .catch(error => console.error('Error loading video data:', error));
+        }
+
+        function parseVideoData(data) {
+            console.log('Parsing video data...');
+            return data.trim().split('\n').map(line => {
+                const [url, start, duration] = line.split(',');
+                const videoId = new URL(url).searchParams.get('v');
+                return { videoId, start: parseInt(start), duration: parseInt(duration) };
+            });
+        }
+
+        function playNextVideo() {
+            console.log('Playing next video. Current index:', currentIndex);
+            if (currentIndex >= videoList.length) {
+                currentIndex = 0; // Loop back to the first video
+                console.log('Looping back to the first video.');
+            }
+            const video = videoList[currentIndex];
+            console.log('Loading video ID:', video.videoId, 'Start:', video.start, 'Duration:', video.duration);
+
+            // Clean up existing player if it exists
+            if (player) {
+                player.destroy(); // Destroy the existing player instance
+                console.log('Previous player instance destroyed.');
+            }
+
+            player = new YT.Player('player', {
+                height: '315',
+                width: '560',
+                videoId: video.videoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 1,
+                    'start': video.start,
+                    'mute': 1 // Ensure video is muted initially
+                },
+                events: {
+                    'onReady': function (event) {
+                        console.log('Player is ready.');
+                        event.target.playVideo();
+                        console.log('Video started playing.');
+
+                        // Unmute the video after 0.1 seconds
+                        setTimeout(() => {
+                            event.target.unMute();
+                            console.log('Video is unmuted.');
+                        }, 1); // 100 milliseconds = 0.1 seconds
+
+
+                        setTimeout(() => {
+                            console.log('Stopping video.');
+                            event.target.stopVideo();
+                            currentIndex++;
+                            playNextVideo();
+                        }, video.duration * 1000); // Stop after the specified duration
+                    },
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
