@@ -4,126 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Playlist</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Welcome to My Video Playlist</h1>
+    <button id="skipButton">Skip</button>
+    <textarea id="videoData" rows="10" cols="50" placeholder="Enter video data here..."></textarea><br>
+    <button id="playButton">Play Videos</button>
+    <button id="genshin">genshin</button>
+    <button id="honkai">honkai</button>
+    <button id="mixed">mixed</button>
     <div id="player"></div>
     <div id="debug"></div>
 
-    <script>
-      var player;
-      var videos = [
-      ];
-
-      var currentVideoIndex = 0;
-
-      // Fetch video data from the text file
-      fetch('video_data.txt') // Make sure this file is hosted in the same directory
-            .then(response => response.text())
-            .then(data => {
-                // Parse the text file line by line
-                data.split('\n').forEach(line => {
-                    const [url, start, duration] = line.split(',');
-                    if (url && start && duration) {
-                        const id = url.split('v=')[1]; // Extract the video ID from the URL
-                        const end = parseInt(start) + parseInt(duration); // Calculate the end time using duration
-                        videos.push({ id, start: parseInt(start), end: end });
-                    }
-                });
-
-                // Initialize the YouTube Player after loading the videos
-                if (videos.length > 0) {
-                    onYouTubeIframeAPIReady();
-                }
-            });
-
-      function loadYouTubeIframeAPI() {
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      }
-
-      function onYouTubeIframeAPIReady() {
-        log('YouTube IFrame API Ready');
-        player = new YT.Player('player', {
-          height: '315',
-          width: '560',
-          videoId: videos[currentVideoIndex].id,
-          playerVars: {
-            'start': videos[currentVideoIndex].start,
-            'end': videos[currentVideoIndex].end,
-            'autoplay': 1,
-            'controls': 1
-          },
-          events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
-            'onError': onPlayerError
-          }
-        });
-      }
-
-      function onPlayerReady(event) {
-        log('Player Ready');
-        event.target.playVideo();
-      }
-
-      function onPlayerStateChange(event) {
-        log('Player State: ' + event.data);
-        if (event.data == YT.PlayerState.ENDED) {
-          log('Video Ended');
-          loadNextVideo();
-        }
-      }
-
-      function onPlayerError(event) {
-        log('Player Error: ' + event.data);
-      }
-
-      function loadNextVideo() {
-        if (player) {
-                player.destroy(); // Destroy the existing player instance
-                console.log('Previous player instance destroyed.');
-            }
-        currentVideoIndex++;
-        log('Loading next video. Index: ' + currentVideoIndex);
-        player = new YT.Player('player', {
-          height: '315',
-          width: '560',
-          videoId: videos[currentVideoIndex].id,
-          playerVars: {
-            'start': videos[currentVideoIndex].start,
-            'end': videos[currentVideoIndex].end,
-            'autoplay': 1,
-            'controls': 1
-          },
-          events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
-            'onError': onPlayerError
-          }
-        });
-        if (currentVideoIndex < videos.length) {
-          var nextVideo = videos[currentVideoIndex];
-          log('Next video: ' + JSON.stringify(nextVideo));
-          player.loadVideoById({
-            videoId: nextVideo.id,
-            startSeconds: nextVideo.start,
-            endSeconds: nextVideo.end
-          });
-        } else {
-          log('Playlist ended');
-        }
-      }
-
-      function log(message) {
-        console.log(message);
-        var debugDiv = document.getElementById('debug');
-        debugDiv.innerHTML += message + '<br>';
-      }
-
-      loadYouTubeIframeAPI();
-    </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="script.js"></script>
 </body>
 </html>

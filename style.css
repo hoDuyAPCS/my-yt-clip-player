@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #333;
+    margin-top: 20px;
+}
+
+#player {
+    margin: 20px auto;
+    width: 560px;
+    height: 315px;
+    background-color: #000;
+}
+
+#debug {
+    margin: 20px auto;
+    width: 560px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
