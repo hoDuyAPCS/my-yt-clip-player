@@ -94,6 +94,27 @@ document.getElementById("honkai").addEventListener("click", () => {
     });
 });
 
+document.getElementById("favorites").addEventListener("click", () => {
+  fetch("favorites.txt")
+    .then((response) => response.text())
+    .then((data) => {
+      // Parse the text file line by line
+      data.split("\n").forEach((line) => {
+        const [url, start, end] = line.split(",");
+        if (url && start && end) {
+          const id = url.split("v=")[1];
+          videos.push({ id, start: parseInt(start), end: parseInt(end) });
+        }
+      });
+
+      // Initialize the YouTube Player after loading the videos
+      if (videos.length > 0) {
+        shuffleArray(videos);
+        onYouTubeIframeAPIReady();
+      }
+    });
+});
+
 document.getElementById("others").addEventListener("click", () => {
   fetch("others.txt")
     .then((response) => response.text())
