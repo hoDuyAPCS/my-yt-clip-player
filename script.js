@@ -169,6 +169,52 @@ document.getElementById("mixed").addEventListener("click", () => {
     });
 });
 
+document.getElementById("everything").addEventListener("click", () => {
+  fetch("genshin.txt")
+    .then((response) => response.text())
+    .then((data) => {
+      data.split("\n").forEach((line) => {
+        const [url, start, end] = line.split(",");
+        if (url && start && end) {
+          const id = url.split("v=")[1];
+          videos.push({ id, start: parseInt(start), end: parseInt(end) });
+        }
+      });
+    })
+    .finally(() => {
+      fetch("honkai.txt")
+        .then((response) => response.text())
+        .then((data) => {
+          data.split("\n").forEach((line) => {
+            const [url, start, end] = line.split(",");
+            if (url && start && end) {
+              const id = url.split("v=")[1];
+              videos.push({ id, start: parseInt(start), end: parseInt(end) });
+            }
+          });
+        })
+        .finally(() => {
+          fetch("others.txt")
+            .then((response) => response.text())
+            .then((data) => {
+              data.split("\n").forEach((line) => {
+                const [url, start, end] = line.split(",");
+                if (url && start && end) {
+                  const id = url.split("v=")[1];
+                  videos.push({ id, start: parseInt(start), end: parseInt(end) });
+                }
+              });
+            })
+            .finally(() => {
+              if (videos.length > 0) {
+                shuffleArray(videos);
+                onYouTubeIframeAPIReady();
+              }
+            });
+        });
+    });
+});
+
 function onYouTubeIframeAPIReady() {
   log("YouTube IFrame API Ready");
   player = new YT.Player("player", {
