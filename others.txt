@@ -10,3 +10,5 @@ https://www.youtube.com/watch?v=Ukp1iNI6M0Q,0,56,narrative
 https://www.youtube.com/watch?v=ZzRe9SF3ha4,0,296,fate_asmv
 https://www.youtube.com/watch?v=QR9ltBxdSfc,0,287,refrain
 https://www.youtube.com/watch?v=aP_b4MVMNJo,0,308,nichijou
+https://www.youtube.com/watch?v=OvY_2WuGIYo,5,65,fate_fgo
+https://www.youtube.com/watch?v=FUUrWUHo_Ig,4,94,fate_fgo_special
