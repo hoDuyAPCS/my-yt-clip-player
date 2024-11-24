@@ -215,6 +215,27 @@ document.getElementById("everything").addEventListener("click", () => {
     });
 });
 
+document.getElementById("gura").addEventListener("click", () => {
+  fetch("gura.txt")
+    .then((response) => response.text())
+    .then((data) => {
+      // Parse the text file line by line
+      data.split("\n").forEach((line) => {
+        const [url, start, end] = line.split(",");
+        if (url && start && end) {
+          const id = url.split("v=")[1];
+          videos.push({ id, start: parseInt(start), end: parseInt(end) });
+        }
+      });
+
+      // Initialize the YouTube Player after loading the videos
+      if (videos.length > 0) {
+        shuffleArray(videos);
+        onYouTubeIframeAPIReady();
+      }
+    });
+});
+
 function onYouTubeIframeAPIReady() {
   log("YouTube IFrame API Ready");
   player = new YT.Player("player", {
