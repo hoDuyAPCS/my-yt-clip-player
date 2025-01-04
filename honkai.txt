@@ -21,3 +21,5 @@ https://www.youtube.com/watch?v=s7TWvyzO8FY,0,80,archeron_wake
 https://www.youtube.com/watch?v=LZMJtJBntT0,86,133,sunday
 https://www.youtube.com/watch?v=vWfsu3_cZn4,0,187,miyabi_1
 https://www.youtube.com/watch?v=vWfsu3_cZn4,224,356,miyabi_2
+https://www.youtube.com/watch?v=MCHsXbOkmME,0,50,clockboi
+https://www.youtube.com/watch?v=qFwqIBqiy_w,214,273,amphoreus
