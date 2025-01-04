@@ -1,0 +1,17 @@
+[
+  {
+    "id": "BV1efkvYBEwN",
+    "status": "active",
+    "weight": 1
+  },
+  {
+    "id": "BV1EqBVYzEnM",
+    "status": "active",
+    "weight": 2
+  },
+  {
+    "id": "BV13v411q7o9",
+    "status": "inactive",
+    "weight": 1
+  }
+]
