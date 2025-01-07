@@ -1,66 +1,82 @@
-var player;
+var player = null;
 var videos = [];
 var currentVideoIndex = 0;
-
+let history = [];
 let playlistContainer = document.getElementById('playlist-container');
 
 function showPlaylist() {
-      // Clear any existing content in the playlist container
-      playlistContainer.innerHTML = '';
+  // Clear any existing content in the playlist container
+  playlistContainer.innerHTML = '';
 
-      // Create and append a title
-      let title = document.createElement('h3');
-      title.textContent = 'Playlist';
-      playlistContainer.appendChild(title);
+  // Create and append a title
+  let title = document.createElement('h3');
+  title.textContent = 'Playlist';
+  playlistContainer.appendChild(title);
 
-      // Create a list to display videos
-      let list = document.createElement('ul');
+  // Create a list to display videos
+  let list = document.createElement('ul');
 
-      // Populate the list with video items and thumbnails
-      videos.forEach((video, index) => {
-          let listItem = document.createElement('li');
+  // Populate the list with video items and thumbnails
+  videos.forEach((video, index) => {
+      let listItem = document.createElement('li');
+      listItem.style.display = 'flex';
+      listItem.style.alignItems = 'center'; // Align items in a row
 
-          // Create thumbnail image
-          let thumbnail = document.createElement('img');
-          thumbnail.src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
-          thumbnail.alt = video.title;
-          thumbnail.style.width = '120px';
-          thumbnail.style.marginRight = '10px';
+      // Create thumbnail image
+      let thumbnail = document.createElement('img');
+      thumbnail.src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+      thumbnail.alt = video.title;
+      thumbnail.style.width = '120px';
+      thumbnail.style.marginRight = '10px';
 
-          // Create index and title text
-          let videoIndex = document.createElement('span');
-          videoIndex.textContent = `${index + 1}. `;
-          videoIndex.style.fontWeight = 'bold';
+      // Create index and title text
+      let videoIndex = document.createElement('span');
+      videoIndex.textContent = `[${index + 1}]`;
+      videoIndex.style.fontWeight = 'bold';
 
-          let videoTitle = document.createElement('span');
-          videoTitle.textContent = video.title;
+      let videoTitle = document.createElement('span');
+      videoTitle.textContent = video.title;
+      videoTitle.style.fontSize = '16px';  // Optional: Adjust font size
+      videoTitle.style.fontWeight = 'bold'
 
-          // Append index, thumbnail, and title to list item
-          listItem.appendChild(videoIndex);
-          listItem.appendChild(thumbnail);
-          listItem.appendChild(videoTitle);
-          list.appendChild(listItem);
-      });
+      // Append index, thumbnail, and title to list item
+      listItem.appendChild(videoIndex);
+      listItem.appendChild(thumbnail);
+      listItem.appendChild(videoTitle);
+      list.appendChild(listItem);
+  });
 
-      // Append the list to the container
-      playlistContainer.appendChild(list);
+  // Append the list to the container
+  playlistContainer.appendChild(list);
 }
 
 document.getElementById("skipButton").addEventListener("click", () => {
-    log("Skip button clicked");
-    loadNextVideo(); // Call the function to load the next video
+  log("Skip button clicked");
+  if (player) {
+    const videoDuration = player.getDuration(); // Get the duration of the current video
+    player.seekTo(videoDuration, true); // Seek to the end of the video
+  }
+});
+function weightedShuffleArray(array) {
+  // Calculate the total weight
+  const totalWeight = array.reduce((sum, obj) => sum + obj.weight, 0);
+
+  // Assign a random value scaled by the normalized weight to each object
+  array.forEach(obj => {
+    obj.random = Math.random() * (obj.weight / totalWeight);
   });
 
-// Helper function to shuffle an array
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
+  // Sort the array in place based on the random values
+  array.sort((a, b) => b.random - a.random);
+
+  // Remove the random property after sorting
+  array.forEach(obj => {
+    delete obj.random;
+  });
+}
 
 document.getElementById("shuffleButton").addEventListener("click", function() {
-    shuffleArray(videos); // Shuffle the videos array
+    weightedShuffleArray(videos); // Shuffle the videos array
     showPlaylist(); // Display the shuffled playlist
 });
 
@@ -82,6 +98,7 @@ document.getElementById("shuffleButton").addEventListener("click", function() {
 //             onYouTubeIframeAPIReady();
 //         }
 //     });
+
 function fetchAndProcessVideos(name) {
   return new Promise((resolve, reject) => {
     // Fetch the JSON file
@@ -95,7 +112,7 @@ function fetchAndProcessVideos(name) {
       .then((data) => {
         // Process the JSON data
         data.forEach((video) => {
-          const { id, start, end, status, weight } = video;
+          const { id, start, end, status, weight, title } = video;
 
           // Check if the video is active (status is "active")
           if (status === "active") {
@@ -104,7 +121,7 @@ function fetchAndProcessVideos(name) {
 
             // If the video ID does not exist in the array, add it
             if (!videoExists) {
-              videos.push({ id, start, end, weight });
+              videos.push({ id, start, end, weight, title });
             }
           }
         });
@@ -209,21 +226,25 @@ document.getElementById("gura").addEventListener("click", (event) => {
   });
 });
 
-function onYouTubeIframeAPIReady(videoId, start, end) {
+function onYouTubeIframeAPIReady(videoId = "Ladu1Innw_Y", start, end) {
+  log("YouTube IFrame API Ready");
+  const video = { videoId: videoId, start: start, end: end };
+  console.log("Playing video:", video);
+  
   player = new YT.Player("video-container", {
     height: "315",
     width: "560",
     videoId: videoId,
     playerVars: {
-      start: start, 
-      end: end,     
-      autoplay: 1,  
-      controls: 1, 
+      start: start,
+      end: end,
+      autoplay: 1,
+      controls: 1,
     },
     events: {
-      onReady: onPlayerReady,         // Triggered when the player is ready
-      onStateChange: onPlayerStateChange, // Triggered when the player's state changes (e.g., play, pause)
-      onError: onPlayerError,         // Triggered if an error occurs during playback
+      onReady: onPlayerReady, // Triggered when the player is ready
+      onStateChange: (event) => onPlayerStateChange(event, video), // Pass the video object
+      onError: onPlayerError, // Triggered if an error occurs during playback
     },
   });
 }
@@ -244,30 +265,45 @@ function playBilibiliVideo(videoId) {
     // Append the iframe to the container
     videoContainer.appendChild(iframe);
 }
+
 function playVideos() {
   let index = 0; // Start with the first video
 
   function playNextVideo() {
     if (index < videos.length) {
       const video = videos[index];
-
       // Play the current video using the YouTube API function
       onYouTubeIframeAPIReady(video.id, video.start, video.end);
-
-      // Listen for the end of the video
-      player.addEventListener("onStateChange", function (event) {
-        if (event.data === YT.PlayerState.ENDED) {
-          index++; // Move to the next video
-          playNextVideo(); // Recursively call to play the next video
-        }
-      });
-    } else {
+    } 
+    else {
       console.log("All videos have been played.");
     }
   }
 
   playNextVideo(); // Start playing the first video
 }
+
+function playPreviousVideo() {
+  
+  if (history.length > 0) {
+    if (player) {
+      player.destroy(); // Destroy the existing player instance
+      console.log("Previous player instance destroyed.");
+    }
+    // Remove the last played video from the history
+    const previousVideo = history.pop();
+
+    // Play the video using the YouTube API
+    onYouTubeIframeAPIReady(previousVideo.videoId, previousVideo.start, previousVideo.end);
+
+    console.log("Playing previous video:", previousVideo);
+  } else {
+    console.log("No previous videos in the history.");
+  }
+}
+
+document.getElementById("Previous").addEventListener("click", playPreviousVideo);
+
 document.getElementById("PlayVideos").addEventListener("click", playVideos);
 
 document.getElementById('bilibili').addEventListener('click', () => {
@@ -293,14 +329,16 @@ function onPlayerReady(event) {
   event.target.playVideo();
 }
 
-function onPlayerStateChange(event) {
+function onPlayerStateChange(event, video) {
   log("Player State: " + event.data);
+  
   if (event.data == YT.PlayerState.ENDED) {
+    history.push(video);
+    console.log("History:", history);
     log("Video Ended");
     loadNextVideo();
   }
 }
-
 function onPlayerError(event) {
   log("Player Error: " + event.data);
 }
@@ -311,26 +349,12 @@ function loadNextVideo() {
     console.log("Previous player instance destroyed.");
   }
   currentVideoIndex++;
-  log("Video number : " + currentVideoIndex);
+  log("Video number: " + currentVideoIndex);
+  
   if (currentVideoIndex < videos.length) {
-    var nextVideo = videos[currentVideoIndex];
+    const nextVideo = videos[currentVideoIndex];
     log("Next video: " + JSON.stringify(nextVideo));
-    player = new YT.Player("player", {
-      height: "315",
-      width: "560",
-      videoId: nextVideo.id,
-      playerVars: {
-        start: nextVideo.start,
-        end: nextVideo.end,
-        autoplay: 1,
-        controls: 1,
-      },
-      events: {
-        onReady: onPlayerReady,
-        onStateChange: onPlayerStateChange,
-        onError: onPlayerError,
-      },
-    });
+    onYouTubeIframeAPIReady(nextVideo.id, nextVideo.start, nextVideo.end);
   } else {
     log("Playlist ended");
   }
