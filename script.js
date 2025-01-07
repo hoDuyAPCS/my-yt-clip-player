@@ -76,6 +76,7 @@ function weightedShuffleArray(array) {
 }
 
 document.getElementById("shuffleButton").addEventListener("click", function() {
+  currentVideoIndex = -1; // Reset the current video index
     weightedShuffleArray(videos); // Shuffle the videos array
     showPlaylist(); // Display the shuffled playlist
 });
@@ -290,6 +291,8 @@ function playPreviousVideo() {
       player.destroy(); // Destroy the existing player instance
       console.log("Previous player instance destroyed.");
     }
+    if (currentVideoIndex > 0) {
+    currentVideoIndex = currentVideoIndex - 1;}
     // Remove the last played video from the history
     const previousVideo = history.pop();
 
