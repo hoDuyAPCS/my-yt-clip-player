@@ -291,7 +291,7 @@ function playPreviousVideo() {
       player.destroy(); // Destroy the existing player instance
       console.log("Previous player instance destroyed.");
     }
-    if (currentVideoIndex > 0) {
+    if (currentVideoIndex > -1) {
     currentVideoIndex = currentVideoIndex - 1;}
     // Remove the last played video from the history
     const previousVideo = history.pop();
