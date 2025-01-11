@@ -221,7 +221,7 @@ document.getElementById("gura").addEventListener("click", () => {
     .then((data) => {
       // Parse the text file line by line
       data.split("\n").forEach((line) => {
-        const [url, start, end] = line.split(",");
+        const [url, start, end, name] = line.split(",");
         if (url && start && end) {
           const id = url.split("v=")[1];
           videos.push({ id, start: parseInt(start), end: parseInt(end) });
@@ -234,6 +234,22 @@ document.getElementById("gura").addEventListener("click", () => {
         onYouTubeIframeAPIReady();
       }
     });
+});
+
+document.getElementById("test").addEventListener("click", ()=>{
+  fetchWebpage().then(data=>{
+    data.forEach(item=>{
+      const [url, start, end] = item.split(",");
+      if (url && start && end) {
+        const id = url.split("v=")[1];
+        videos.push({ id, start: parseInt(start), end: parseInt(end) });
+      }
+    });
+    if (videos.length > 0) {
+      shuffleArray(videos);
+      onYouTubeIframeAPIReady();
+    }
+  });
 });
 
 function onYouTubeIframeAPIReady() {
@@ -308,4 +324,26 @@ function log(message) {
   console.log(message);
   var debugDiv = document.getElementById("debug");
   debugDiv.innerHTML += message + "<br>";
+}
+
+
+async function fetchWebpage() {
+  try {
+    const response = await fetch('https://rentry.co/hoduy_hdytclip', {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const element = doc.querySelector('.clippy');
+    if (element) {
+      const value = element.getAttribute('value');
+      const array = value.split('\n');
+      return array;
+    }
+  } catch (error) {
+    console.error('Error fetching webpage:', error);
+    return [];
+  }
 }
