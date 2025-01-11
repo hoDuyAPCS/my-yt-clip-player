@@ -96,7 +96,7 @@ document.getElementById("shuffleButton").addEventListener("click", function() {
 
 //         // Initialize the YouTube Player after loading the videos
 //         if (videos.length > 0) {
-//             onYouTubeIframeAPIReady();
+//             initializePlayer();
 //         }
 //     });
 
@@ -208,7 +208,9 @@ document.getElementById("everything").addEventListener("click", (event) => {
   fetchAndProcessVideos("others")
   .then(() => {
     // After processing the JSON data, show the playlist
+    weightedShuffleArray(videos)
     showPlaylist();
+    playVideos();
   })
   .catch((error) => {
     console.error("Error processing the everything data:", error);
@@ -227,7 +229,7 @@ document.getElementById("gura").addEventListener("click", (event) => {
   });
 });
 
-function onYouTubeIframeAPIReady(videoId = "Ladu1Innw_Y", start, end) {
+function initializePlayer(videoId = "Ladu1Innw_Y", start, end) {
   log("YouTube IFrame API Ready");
   const video = { videoId: videoId, start: start, end: end };
   console.log("Playing video:", video);
@@ -274,7 +276,7 @@ function playVideos() {
     if (index < videos.length) {
       const video = videos[index];
       // Play the current video using the YouTube API function
-      onYouTubeIframeAPIReady(video.id, video.start, video.end);
+      initializePlayer(video.id, video.start, video.end);
     } 
     else {
       console.log("All videos have been played.");
@@ -297,7 +299,7 @@ function playPreviousVideo() {
     const previousVideo = history.pop();
 
     // Play the video using the YouTube API
-    onYouTubeIframeAPIReady(previousVideo.videoId, previousVideo.start, previousVideo.end);
+    initializePlayer(previousVideo.videoId, previousVideo.start, previousVideo.end);
 
     console.log("Playing previous video:", previousVideo);
   } else {
@@ -357,7 +359,7 @@ function loadNextVideo() {
   if (currentVideoIndex < videos.length) {
     const nextVideo = videos[currentVideoIndex];
     log("Next video: " + JSON.stringify(nextVideo));
-    onYouTubeIframeAPIReady(nextVideo.id, nextVideo.start, nextVideo.end);
+    initializePlayer(nextVideo.id, nextVideo.start, nextVideo.end);
   } else {
     log("Playlist ended");
   }
