@@ -39,7 +39,7 @@ document.getElementById("playButton").addEventListener("click", () => {
 
   // Parse the text field data
   videoData.split("\n").forEach((line) => {
-    const [url, start, end] = line.split(",");
+    let [url, start = "0", end = "99999"] = line.split(",");
     if (url && start && end) {
       const id = url.split("v=")[1];
       videos.push({ id, start: parseInt(start), end: parseInt(end) });

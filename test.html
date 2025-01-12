@@ -4,43 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fetch Webpage Content</title>
+  <title>Play bilibili</title>
 </head>
 
 <body>
-  <h1>Webpage Content</h1>
-  <div id="content"></div>
-
+  <h1>Video</h1>
+  <iframe
+    src="//player.bilibili.com/player.html?isOutside=true&aid=113786518307260&bvid=BV1U2rUYcEkk&cid=27746503919&p=1"
+    scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+  <script src="https://s1.hdslb.com/bfs/static/jinkela/long/js/pilot-player.min.js"></script>
   <script>
-    async function fetchWebpage() {
-      try {
-        const response = await fetch('https://rentry.co/hoduy_hdytclip', {
-          headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
-        const html = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+    const player = new BilibiliPlayer({
+      id: 'player',
+      bvid: 'BV1U2rUYcEkk', // Replace with your Bilibili video ID
+      width: 560,
+      height: 315,
+      page: 1,
+      autoplay: true
+    });
 
-        const element = doc.querySelector('.clippy');
-        if (element) {
-          const value = element.getAttribute('value');
-          const array = value.split('\n');
-          console.log(array);
-        }
-
-
-        // Example: Extracting the content from the webpage
-
-        // Example: Logging the data (you can modify how to handle the data)
-
-      } catch (error) {
-        console.error('Error fetching webpage:', error);
-        document.getElementById('content').textContent = 'Error fetching content';
-      }
-    }
-
-    fetchWebpage();
+    // Example: Adding event listener
+    player.on('play', () => {
+      console.log('The video is playing');
+    });
   </script>
+
 </body>
 
 </html>
