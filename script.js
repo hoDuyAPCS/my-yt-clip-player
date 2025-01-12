@@ -239,10 +239,10 @@ document.getElementById("gura").addEventListener("click", () => {
 document.getElementById("test").addEventListener("click", ()=>{
   fetchWebpage().then(data=>{
     data.forEach(item=>{
-      const [url, start, end] = item.split(",");
+      const [url, start, end, desc] = item.split(",");
       if (url && start && end) {
         const id = url.split("v=")[1];
-        videos.push({ id, start: parseInt(start), end: parseInt(end) });
+        videos.push({ id, start: parseInt(start), end: parseInt(end), desc });
       }
     });
     if (videos.length > 0) {
