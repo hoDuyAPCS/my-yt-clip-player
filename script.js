@@ -1,6 +1,8 @@
 var player;
 var videos = [];
 var currentVideoIndex = 0;
+let history = [];
+let playlistContainer = document.getElementById('playlist-container');
 
 document.getElementById("skipButton").addEventListener("click", () => {
     log("Skip button clicked");
@@ -33,7 +35,7 @@ function shuffleArray(array) {
 
 //         // Initialize the YouTube Player after loading the videos
 //         if (videos.length > 0) {
-//             onYouTubeIframeAPIReady();
+//             initializePlayer();
 //         }
 //     });
 
@@ -51,7 +53,7 @@ document.getElementById("playButton").addEventListener("click", () => {
 
   // Initialize the YouTube Player after loading the videos
   if (videos.length > 0) {
-    onYouTubeIframeAPIReady();
+    initializePlayer();
   }
 });
 
@@ -71,7 +73,7 @@ document.getElementById("genshin").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        onYouTubeIframeAPIReady();
+        initializePlayer();
       }
     });
 });
@@ -92,7 +94,7 @@ document.getElementById("honkai").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        onYouTubeIframeAPIReady();
+        initializePlayer();
       }
     });
 });
@@ -113,7 +115,7 @@ document.getElementById("favorites").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        onYouTubeIframeAPIReady();
+        initializePlayer();
       }
     });
 });
@@ -134,7 +136,7 @@ document.getElementById("others").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        onYouTubeIframeAPIReady();
+        initializePlayer();
       }
     });
 });
@@ -166,7 +168,7 @@ document.getElementById("mixed").addEventListener("click", () => {
         .finally(() => {
           if (videos.length > 0) {
             shuffleArray(videos);
-            onYouTubeIframeAPIReady();
+            initializePlayer();
           }
         });
     });
@@ -211,7 +213,7 @@ document.getElementById("everything").addEventListener("click", () => {
             .finally(() => {
               if (videos.length > 0) {
                 shuffleArray(videos);
-                onYouTubeIframeAPIReady();
+                initializePlayer();
               }
             });
         });
@@ -234,7 +236,7 @@ document.getElementById("gura").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        onYouTubeIframeAPIReady();
+        initializePlayer();
       }
     });
 });
@@ -250,14 +252,14 @@ document.getElementById("test").addEventListener("click", ()=>{
     });
     if (videos.length > 0) {
       shuffleArray(videos);
-      onYouTubeIframeAPIReady();
+      initializePlayer();
     }
   });
 });
 
-function onYouTubeIframeAPIReady() {
+function initializePlayer() {
   log("YouTube IFrame API Ready");
-  player = new YT.Player("player", {
+  player = new YT.Player("video-container", {
     height: "315",
     width: "560",
     videoId: videos[currentVideoIndex].id,
@@ -298,26 +300,12 @@ function loadNextVideo() {
     console.log("Previous player instance destroyed.");
   }
   currentVideoIndex++;
-  log("Video number : " + currentVideoIndex);
+  log("Video number: " + currentVideoIndex);
+  
   if (currentVideoIndex < videos.length) {
-    var nextVideo = videos[currentVideoIndex];
+    const nextVideo = videos[currentVideoIndex];
     log("Next video: " + JSON.stringify(nextVideo));
-    player = new YT.Player("player", {
-      height: "315",
-      width: "560",
-      videoId: nextVideo.id,
-      playerVars: {
-        start: nextVideo.start,
-        end: nextVideo.end,
-        autoplay: 1,
-        controls: 1,
-      },
-      events: {
-        onReady: onPlayerReady,
-        onStateChange: onPlayerStateChange,
-        onError: onPlayerError,
-      },
-    });
+    initializePlayer(nextVideo.id, nextVideo.start, nextVideo.end);
   } else {
     log("Playlist ended");
   }
