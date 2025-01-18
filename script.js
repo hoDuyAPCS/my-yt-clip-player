@@ -1,20 +1,12 @@
 var player;
 var videos = [];
 var currentVideoIndex = 0;
-let history = [];
-let playlistContainer = document.getElementById('playlist-container');
 
 document.getElementById("skipButton").addEventListener("click", () => {
-  log("Skip button clicked");
-  if (player) {
-    const videoDuration = player.getDuration(); // Get the duration of the current video
-    player.seekTo(videoDuration, true); // Seek to the end of the video
-  }
-});
+    log("Skip button clicked");
+    loadNextVideo(); // Call the function to load the next video
+  });
 
-function showPlaylist() {
-  }
-  
 // Helper function to shuffle an array
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -38,7 +30,7 @@ function shuffleArray(array) {
 
 //         // Initialize the YouTube Player after loading the videos
 //         if (videos.length > 0) {
-//             initializePlayer();
+//             onYouTubeIframeAPIReady();
 //         }
 //     });
 
@@ -56,7 +48,7 @@ document.getElementById("playButton").addEventListener("click", () => {
 
   // Initialize the YouTube Player after loading the videos
   if (videos.length > 0) {
-    initializePlayer();
+    onYouTubeIframeAPIReady();
   }
 });
 
@@ -76,7 +68,7 @@ document.getElementById("genshin").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        initializePlayer();
+        onYouTubeIframeAPIReady();
       }
     });
 });
@@ -97,7 +89,7 @@ document.getElementById("honkai").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        initializePlayer();
+        onYouTubeIframeAPIReady();
       }
     });
 });
@@ -118,7 +110,7 @@ document.getElementById("favorites").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        initializePlayer();
+        onYouTubeIframeAPIReady();
       }
     });
 });
@@ -139,7 +131,7 @@ document.getElementById("others").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        initializePlayer();
+        onYouTubeIframeAPIReady();
       }
     });
 });
@@ -171,7 +163,7 @@ document.getElementById("mixed").addEventListener("click", () => {
         .finally(() => {
           if (videos.length > 0) {
             shuffleArray(videos);
-            initializePlayer();
+            onYouTubeIframeAPIReady();
           }
         });
     });
@@ -216,7 +208,7 @@ document.getElementById("everything").addEventListener("click", () => {
             .finally(() => {
               if (videos.length > 0) {
                 shuffleArray(videos);
-                initializePlayer();
+                onYouTubeIframeAPIReady();
               }
             });
         });
@@ -239,7 +231,7 @@ document.getElementById("gura").addEventListener("click", () => {
       // Initialize the YouTube Player after loading the videos
       if (videos.length > 0) {
         shuffleArray(videos);
-        initializePlayer();
+        onYouTubeIframeAPIReady();
       }
     });
 });
@@ -255,46 +247,39 @@ document.getElementById("test").addEventListener("click", ()=>{
     });
     if (videos.length > 0) {
       shuffleArray(videos);
-      initializePlayer();
+      onYouTubeIframeAPIReady();
     }
   });
 });
 
-function initializePlayer(videoId = "Ladu1Innw_Y", start, end) {
+function onYouTubeIframeAPIReady() {
   log("YouTube IFrame API Ready");
-  const video = { videoId: videoId, start: start, end: end };
-  console.log("Playing video:", video);
-  
-  player = new YT.Player("video-container", {
+  player = new YT.Player("player", {
     height: "315",
     width: "560",
-    videoId: videoId,
+    videoId: videos[currentVideoIndex].id,
     playerVars: {
-      start: start,
-      end: end,
+      start: videos[currentVideoIndex].start,
+      end: videos[currentVideoIndex].end,
       autoplay: 1,
       controls: 1,
     },
     events: {
-      onReady: onPlayerReady, // Triggered when the player is ready
-      onStateChange: (event) => onPlayerStateChange(event, video), // Pass the video object
-      onError: onPlayerError, // Triggered if an error occurs during playback
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange,
+      onError: onPlayerError,
     },
   });
 }
-
 
 function onPlayerReady(event) {
   log("Player Ready");
   event.target.playVideo();
 }
 
-function onPlayerStateChange(event, video) {
+function onPlayerStateChange(event) {
   log("Player State: " + event.data);
-  
   if (event.data == YT.PlayerState.ENDED) {
-    history.push(video);
-    console.log("History:", history);
     log("Video Ended");
     loadNextVideo();
   }
@@ -310,12 +295,26 @@ function loadNextVideo() {
     console.log("Previous player instance destroyed.");
   }
   currentVideoIndex++;
-  log("Video number: " + currentVideoIndex);
-  
+  log("Video number : " + currentVideoIndex);
   if (currentVideoIndex < videos.length) {
-    const nextVideo = videos[currentVideoIndex];
+    var nextVideo = videos[currentVideoIndex];
     log("Next video: " + JSON.stringify(nextVideo));
-    initializePlayer(nextVideo.id, nextVideo.start, nextVideo.end);
+    player = new YT.Player("player", {
+      height: "315",
+      width: "560",
+      videoId: nextVideo.id,
+      playerVars: {
+        start: nextVideo.start,
+        end: nextVideo.end,
+        autoplay: 1,
+        controls: 1,
+      },
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange,
+        onError: onPlayerError,
+      },
+    });
   } else {
     log("Playlist ended");
   }
