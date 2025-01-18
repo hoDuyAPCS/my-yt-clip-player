@@ -7,6 +7,9 @@ document.getElementById("skipButton").addEventListener("click", () => {
     loadNextVideo(); // Call the function to load the next video
   });
 
+function showPlaylist() {
+  }
+  
 // Helper function to shuffle an array
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
