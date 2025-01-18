@@ -1,29 +1,93 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
     margin: 0;
     padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    text-align: center;
 }
 
 h1 {
-    color: #333;
-    margin-top: 20px;
+    margin: 20px 0;
+    color: #4CAF50;
 }
 
-#player {
+/* Main Layout */
+#main-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
     margin: 20px auto;
-    width: 560px;
+    max-width: 1200px;
+}
+
+/* Video Container */
+/* Video Player */
+#video-container {
+    width: 33%;
     height: 315px;
-    background-color: #000;
+    background-color: #333;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensure borders and padding are included in dimensions */
 }
 
-#debug {
-    margin: 20px auto;
-    width: 560px;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: #f1f1f1;
+/* Text Data Input */
+#videoData {
+    width: 33%;
+    height: 315px;
     padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
     border: 1px solid #ccc;
-    text-align: left;
+    resize: none;
+    box-sizing: border-box; /* Ensure borders and padding are included in dimensions */
+}
+
+
+/* Log Section */
+#log-container {
+    width: 33%;
+    height: 315px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box; /* Include padding and border in dimensions */
+}
+/* Button Groups */
+.button-group {
+    margin: 40px 0; /* Increased vertical gap between groups of buttons */
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Increased gap between individual buttons */
+    flex-wrap: wrap;
+}
+
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Specific Button Styles */
+#everything {
+    width: 150px;
 }
