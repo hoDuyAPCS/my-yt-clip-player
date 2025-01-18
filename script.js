@@ -5,9 +5,12 @@ let history = [];
 let playlistContainer = document.getElementById('playlist-container');
 
 document.getElementById("skipButton").addEventListener("click", () => {
-    log("Skip button clicked");
-    loadNextVideo(); // Call the function to load the next video
-  });
+  log("Skip button clicked");
+  if (player) {
+    const videoDuration = player.getDuration(); // Get the duration of the current video
+    player.seekTo(videoDuration, true); // Seek to the end of the video
+  }
+});
 
 function showPlaylist() {
   }
@@ -257,34 +260,41 @@ document.getElementById("test").addEventListener("click", ()=>{
   });
 });
 
-function initializePlayer() {
+function initializePlayer(videoId = "Ladu1Innw_Y", start, end) {
   log("YouTube IFrame API Ready");
+  const video = { videoId: videoId, start: start, end: end };
+  console.log("Playing video:", video);
+  
   player = new YT.Player("video-container", {
     height: "315",
     width: "560",
-    videoId: videos[currentVideoIndex].id,
+    videoId: videoId,
     playerVars: {
-      start: videos[currentVideoIndex].start,
-      end: videos[currentVideoIndex].end,
+      start: start,
+      end: end,
       autoplay: 1,
       controls: 1,
     },
     events: {
-      onReady: onPlayerReady,
-      onStateChange: onPlayerStateChange,
-      onError: onPlayerError,
+      onReady: onPlayerReady, // Triggered when the player is ready
+      onStateChange: (event) => onPlayerStateChange(event, video), // Pass the video object
+      onError: onPlayerError, // Triggered if an error occurs during playback
     },
   });
 }
+
 
 function onPlayerReady(event) {
   log("Player Ready");
   event.target.playVideo();
 }
 
-function onPlayerStateChange(event) {
+function onPlayerStateChange(event, video) {
   log("Player State: " + event.data);
+  
   if (event.data == YT.PlayerState.ENDED) {
+    history.push(video);
+    console.log("History:", history);
     log("Video Ended");
     loadNextVideo();
   }
