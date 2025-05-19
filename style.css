@@ -1,29 +1,224 @@
 body {
-    font-family: Arial, sans-serif;
+    /* Modern black and white theme */
+    background-color: #181818; /* Dark background */
+    color: #E0E0E0; /* Light text color */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* More modern font */
     text-align: center;
     margin: 0;
-    padding: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+    min-height: 100vh; /* Ensure body takes at least full viewport height */
 }
 
 h1 {
-    color: #333;
-    margin-top: 20px;
+    color: #FFFFFF; /* Pure white for heading */
+    margin-top: 0; /* Adjust margin */
+    margin-bottom: 30px; /* Space below heading */
+    font-size: 2.5em; /* Larger heading */
+    font-weight: 300; /* Lighter font weight */
 }
 
+/* Container for the two-column layout */
+.container {
+    display: flex;
+    flex-wrap: wrap; /* Allow panels to wrap on smaller screens */
+    width: 100%;
+    max-width: 1200px; /* Max width for the whole layout */
+    gap: 30px; /* Space between columns */
+    justify-content: center; /* Center columns if total width is less than max-width */
+}
+
+.left-panel {
+    flex: 2; /* Allow left panel to take more space */
+    min-width: 300px; /* Minimum width for left panel */
+    display: flex;
+    flex-direction: column; /* Stack player and debug vertically */
+    gap: 20px; /* Space between player and debug */
+}
+
+.right-panel {
+    flex: 1; /* Allow right panel to take less space */
+    min-width: 250px; /* Minimum width for right panel */
+    display: flex;
+    flex-direction: column; /* Stack buttons and textarea vertically */
+    align-items: center; /* Center items within the right panel */
+}
+
+
+/* Styling for buttons */
+button {
+    background-color: #333333; /* Dark gray button background */
+    color: #FFFFFF; /* White text on buttons */
+    border: 1px solid #555555; /* Slightly lighter border */
+    padding: 10px 20px;
+    margin: 5px; /* Space between buttons */
+    border-radius: 4px; /* Slightly rounded corners */
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transition on hover */
+    width: auto; /* Allow buttons to size based on content */
+    min-width: 100px; /* Ensure a minimum width */
+}
+
+button:hover {
+    background-color: #555555; /* Lighter gray on hover */
+    border-color: #777777;
+}
+
+button:active {
+    background-color: #222222; /* Darker gray when pressed */
+    border-color: #444444;
+}
+
+/* Style for the container of buttons to wrap them */
+.button-container {
+    display: flex;
+    flex-wrap: wrap; /* Wrap buttons to the next line */
+    justify-content: center; /* Center buttons within their container */
+    margin-bottom: 20px; /* Space below button group */
+    width: 100%; /* Take full width of the right panel */
+}
+
+/* Styling for the textarea */
+textarea {
+    background-color: #282828; /* Dark gray background for textarea */
+    color: #E0E0E0; /* Light text color */
+    border: 1px solid #555555; /* Border color */
+    padding: 10px;
+    margin: 0; /* Remove top/bottom margin */
+    margin-bottom: 20px; /* Space below textarea */
+    border-radius: 4px;
+    font-size: 1em;
+    resize: vertical; /* Allow vertical resizing */
+    width: calc(100% - 22px); /* Adjust width considering padding and border */
+    min-height: 120px; /* Set a minimum height (adjust based on rows="5") */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+textarea::placeholder {
+    color: #AAAAAA; /* Lighter gray for placeholder text */
+}
+
+
 #player {
-    margin: 20px auto;
-    width: 560px;
-    height: 315px;
-    background-color: #000;
+    width: 100%; /* Make player responsive within its panel */
+    max-width: 700px; /* Max width within the left panel */
+    height: 394px; /* Maintain aspect ratio (16:9 for max 700px width) - Adjust if needed */
+    background-color: #000; /* Black background for the player area */
+    border: 1px solid #555555; /* Subtle border around player */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+    margin: 0 auto; /* Center player horizontally if less than max-width */
 }
 
 #debug {
-    margin: 20px auto;
-    width: 560px;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: #f1f1f1;
-    padding: 10px;
-    border: 1px solid #ccc;
+    width: 100%; /* Make debug responsive within its panel */
+    max-width: 700px; /* Match player max width */
+    max-height: 250px; /* Slightly increased max height for debug */
+    overflow-y: auto; /* Keep scroll for overflow */
+    background-color: #282828; /* Dark background */
+    color: #E0E0E0; /* Light text */
+    padding: 15px; /* More padding */
+    border: 1px solid #555555;
     text-align: left;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font for debug */
+    font-size: 0.9em;
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    word-wrap: break-word; /* Break long words */
+    flex-grow: 1; /* Allow debug to grow to fill space below player */
+    box-sizing: border-box;
+    margin: 0 auto; /* Center debug horizontally */
+}
+
+/* Responsive adjustment for smaller screens */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Stack panels vertically on small screens */
+        gap: 20px; /* Reduce gap when stacked */
+    }
+
+    .left-panel, .right-panel {
+        flex: none; /* Remove flex growing */
+        width: 100%; /* Take full width */
+        min-width: auto; /* Remove min-width constraint */
+    }
+
+    #player {
+        height: auto; /* Allow height to adjust */
+        aspect-ratio: 16 / 9; /* Maintain 16:9 aspect ratio */
+        max-width: 100%;
+    }
+
+    textarea {
+        min-height: 100px; /* Adjust min height for stacked view */
+        width: calc(100% - 22px);
+    }
+
+    .button-container {
+         justify-content: center; /* Center buttons */
+    }
+     button {
+        width: auto; /* Auto width */
+        flex-grow: 1; /* Allow buttons to grow to fill space */
+     }
+
+     #debug {
+        max-height: 200px; /* Adjust debug max height on small screens */
+     }
+}
+
+/* Styling for the loop control container */
+.loop-control {
+    margin-top: 15px; /* Space above the loop control */
+    margin-bottom: 15px; /* Space below the loop control */
+    display: flex; /* Use flexbox to align checkbox and label */
+    align-items: center; /* Vertically center checkbox and label */
+    justify-content: center; /* Center the control horizontally */
+    font-size: 1em;
+    color: #E0E0E0; /* Light text color */
+}
+
+/* Styling for the actual checkbox */
+.loop-control input[type="checkbox"] {
+    /* Hide the default checkbox */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Custom styling */
+    width: 18px;
+    height: 18px;
+    border: 1px solid #555555; /* Darker border */
+    border-radius: 3px; /* Slightly rounded corners */
+    background-color: #282828; /* Dark background */
+    cursor: pointer;
+    margin-right: 8px; /* Space between checkbox and label */
+    position: relative; /* Needed for the checkmark */
+    top: 1px; /* Fine-tune vertical alignment */
+}
+
+/* Styling for the custom checkmark (when checked) */
+.loop-control input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid #FFFFFF; /* White checkmark */
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    display: none; /* Hide by default */
+}
+
+/* Show the checkmark when the checkbox is checked */
+.loop-control input[type="checkbox"]:checked::after {
+    display: block;
+}
+
+/* Styling for the label */
+.loop-control label {
+    cursor: pointer; /* Indicate it's clickable */
 }

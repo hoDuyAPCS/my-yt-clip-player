@@ -1,6 +1,8 @@
 var player;
 var videos = [];
 var currentVideoIndex = 0;
+var loopCheckbox;
+var loopPlaylistCheckbox;
 
 document.getElementById("skipButton").addEventListener("click", () => {
     log("Skip button clicked");
@@ -33,6 +35,9 @@ function shuffleArray(array) {
 //             onYouTubeIframeAPIReady();
 //         }
 //     });
+
+loopCheckbox = document.getElementById("loopCheckbox");
+loopPlaylistCheckbox = document.getElementById("loopPlaylistCheckbox");
 
 document.getElementById("playButton").addEventListener("click", () => {
   const videoData = document.getElementById("videoData").value;
@@ -280,8 +285,18 @@ function onPlayerReady(event) {
 function onPlayerStateChange(event) {
   log("Player State: " + event.data);
   if (event.data == YT.PlayerState.ENDED) {
-    log("Video Ended");
-    loadNextVideo();
+    //log("Video Ended");
+    //loadNextVideo();
+    if (loopCheckbox && loopCheckbox.checked) {
+      log("Looping current video");
+      // Restart the current video from its defined start time
+        const currentVideo = videos[currentVideoIndex];
+        player.seekTo(currentVideo.start, true); // Seek to the start time
+        player.playVideo(); // Play the video again
+      } else {
+        log("Video Ended");
+        loadNextVideo();
+      }
   }
 }
 
@@ -316,7 +331,14 @@ function loadNextVideo() {
       },
     });
   } else {
-    log("Playlist ended");
+    if (loopPlaylistCheckbox && loopPlaylistCheckbox.checked) {
+      log("Looping playlist");
+      currentVideoIndex = -1; // Reset index for new playlist
+      loadNextVideo();
+    }
+    else {
+      log("Playlist ended");
+    }
   }
 }
 
