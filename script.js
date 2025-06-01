@@ -79,8 +79,7 @@ document.getElementById("playButton").addEventListener("click", () => {
   videoData.split("\n").forEach((line) => {
     let [url, start = "0", end = "99999"] = line.split(",");
     if (url && start && end) {
-      const id = url.split("v=")[1];
-      id = id.split("&")[0];//remove time stamps and playlist id stuff
+      const id = url.split("v=")[1].split("&")[0];//remove time stamps and playlist id stuff
       videos.push({ id, start: parseInt(start), end: parseInt(end) });
     }
   });
