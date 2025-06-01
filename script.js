@@ -4,6 +4,39 @@ var currentVideoIndex = 0;
 var loopCheckbox;
 var loopPlaylistCheckbox;
 
+//1-6-2025
+let wakeLock = null;
+
+document.getElementById("lockScreen").addEventListener('click', () => {
+  if (!wakeLock) {
+    requestWakeLock();
+  }
+});
+
+async function requestWakeLock() {
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    console.log('Wake Lock is active!');
+  } catch (err) {
+    console.error(`${err.name}, ${err.message}`);
+  }
+}
+
+const blackoutButton = document.getElementById("nightOut");
+const blackScreen = document.getElementById("blackScreen");
+
+    blackoutButton.addEventListener("click", () => {
+      blackScreen.style.display = "block";
+      blackScreen.classList.add("exitHint");
+    });
+
+    // Click anywhere on black screen to exit
+    blackScreen.addEventListener("click", () => {
+      blackScreen.style.display = "none";
+      blackScreen.classList.remove("exitHint");
+    });
+//END 1-6-2025
+
 document.getElementById("skipButton").addEventListener("click", () => {
     log("Skip button clicked");
     loadNextVideo(); // Call the function to load the next video
@@ -47,6 +80,7 @@ document.getElementById("playButton").addEventListener("click", () => {
     let [url, start = "0", end = "99999"] = line.split(",");
     if (url && start && end) {
       const id = url.split("v=")[1];
+      id = id.split("&")[0];//remove time stamps and playlist id stuff
       videos.push({ id, start: parseInt(start), end: parseInt(end) });
     }
   });

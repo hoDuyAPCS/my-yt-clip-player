@@ -222,3 +222,18 @@ textarea::placeholder {
 .loop-control label {
     cursor: pointer; /* Indicate it's clickable */
 }
+
+#blackScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    z-index: 9999;
+    display: none;
+  }
+
+#blackScreen.exitHint {
+    cursor: pointer;
+}

@@ -10,8 +10,9 @@
 
 <body>
     <h1>Welcome to My Video Playlist</h1>
-
+    
     <div class="container">
+        <div id="blackScreen"></div>
         <div class="left-panel">
             <div id="player"></div>
             <div class="button-container">
@@ -24,10 +25,10 @@
                     <label for="loopPlaylistCheckbox">Loop playlist</label>
                 </div>
             </div>
-            <div id="debug"></div>
-        </div>
-
-        <div class="right-panel">
+            <div class="button-container">
+                <button id="lockScreen">Lock Screen</button>
+                <button id="nightOut">Night Mode</button>
+            </div>
             <div class="button-container">
                 <button id="genshin">genshin</button>
                 <button id="honkai">honkai</button>
@@ -40,6 +41,10 @@
                 <button id="everything">everything</button>
             </div>
             <textarea id="videoData" rows="5" placeholder="Enter video data here..."></textarea>
+        </div>
+
+        <div class="right-panel">
+            <div id="debug"></div>
         </div>
     </div>
 
