@@ -4,6 +4,22 @@ var currentVideoIndex = 0;
 var loopCheckbox;
 var loopPlaylistCheckbox;
 
+//8-6-2025
+const audio = document.getElementById('rainAudio');
+
+let playing = false;
+
+function togglePlay() {
+    if (playing) {
+        audio.pause();
+        
+    } else {
+        audio.play();
+    }
+    playing = !playing;
+}
+//END 8-6-2025
+
 //1-6-2025
 let wakeLock = null;
 
