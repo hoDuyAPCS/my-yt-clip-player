@@ -4,6 +4,13 @@ var currentVideoIndex = 0;
 var loopCheckbox;
 var loopPlaylistCheckbox;
 
+
+function goToSleep() {
+  setTimeout(function() {
+    player.destroy();
+  }, 30*60*1000); // Sleep after 30 minutes
+}
+
 //8-6-2025
 const audio = document.getElementById('rainAudio');
 
