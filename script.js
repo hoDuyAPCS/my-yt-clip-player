@@ -419,6 +419,22 @@ function loadNextVideo() {
   }
 }
 
+function loadPreviousVideo() {
+  if (currentVideoIndex>1){
+    currentVideoIndex-=2;
+    loadNextVideo();
+  }else{
+    currentVideoIndex=-1;
+    loadNextVideo();
+  }
+  
+}
+
+document.getElementById("previousButton").addEventListener("click", () => {
+  log("Previous button clicked");
+  loadPreviousVideo();
+});
+
 function log(message) {
   console.log(message);
   var debugDiv = document.getElementById("debug");
