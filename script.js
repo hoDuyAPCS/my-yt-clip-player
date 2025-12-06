@@ -4,6 +4,57 @@ var currentVideoIndex = 0;
 var loopCheckbox;
 var loopPlaylistCheckbox;
 
+import { fetchButtonData } from "./utils/scaffold.js";
+
+document.getElementById("test2").addEventListener("click", ()=>{
+  fetchButtonData().then(data=>{
+    data.forEach(item=>{
+      const [url, start, end, desc] = item.split(",");
+      createNewButton(desc);
+
+      document.getElementById(desc).addEventListener("click", () => {
+        if (url && start && end) {
+          const id = url.split("v=")[1];
+          videos.push({ id, start: parseInt(start), end: parseInt(end) });
+          onYouTubeIframeAPIReady();
+        }
+        
+      });
+      /*
+      if (url && start && end) {
+        const id = url.split("v=")[1];
+        videos.push({ id, start: parseInt(start), end: parseInt(end), desc });
+      }*/
+    });
+  });
+});
+
+function createNewButton(buttonName) {
+    // 1. Get the container element where the new button will go
+    const container = document.getElementById("dynamic-button-container");
+
+    // 2. Create the new <button> element in memory
+    const newButton = document.createElement("button");
+
+    // 4. Set the text and attributes for the new button
+    //newButton.innerText = `Dynamic Button #${buttonsCreated} (Count was ${count})`;
+    //newButton.className = 'button'; // Useful for later CSS styling
+
+    newButton.innerText = buttonName;
+    newButton.id = buttonName;
+    // OPTIONAL: Give the new button a unique action
+    newButton.onclick = function() {
+        //alert(`You clicked Button #${buttonsCreated}!`);
+    };
+
+
+    // 5. Add a line break for spacing, then add the new button to the container
+    //container.appendChild(document.createElement("br"));
+    container.appendChild(newButton);
+
+    
+}
+
 
 function goToSleep() {
   setTimeout(function() {

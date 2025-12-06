@@ -81,6 +81,14 @@ button:active {
     width: 100%; /* Take full width of the right panel */
 }
 
+.dynamic-button-container{
+    display: flex;
+    flex-wrap: wrap; /* Wrap buttons to the next line */
+    justify-content: center; /* Center buttons within their container */
+    margin-bottom: 20px; /* Space below button group */
+    width: 100%; /* Take full width of the right panel */
+}
+
 /* Styling for the textarea */
 textarea {
     background-color: #282828; /* Dark gray background for textarea */

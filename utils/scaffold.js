@@ -1,6 +1,6 @@
-async function fetchWebpage() {
+export async function fetchButtonData() {
   try {
-    const response = await fetch('https://rentry.co/hoduy_hdytclip', {
+    const response = await fetch('https://rentry.co/hoduy_hdytclip2', {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     });
     const html = await response.text();
