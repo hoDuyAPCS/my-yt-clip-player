@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sap den Tet roi !</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        .countdown-container {
+            display: flex;
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .time-value {
+            font-size: 5.5rem;
+            font-weight: 300;
+            font-family: 'Courier New', monospace;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+        }
+
+        .time-label {
+            font-size: 1rem;
+            color: #0a0;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .separator {
+            font-size: 5.5rem;
+            font-weight: 300;
+            color: #0f0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .target-date {
+            font-size: 1.2rem;
+            color: #0a0;
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            border-top: 1px solid #222;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .countdown-container {
+                gap: 1.5rem;
+            }
+            
+            .time-value {
+                font-size: 4.5rem;
+            }
+            
+            .separator {
+                font-size: 4.5rem;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .countdown-container {
+                gap: 0.8rem;
+            }
+            
+            .time-value {
+                font-size: 3.5rem;
+            }
+            
+            .separator {
+                font-size: 3.5rem;
+                display: none;
+            }
+            
+            .title {
+                font-size: 1.4rem;
+                margin-bottom: 2rem;
+            }
+            
+            .time-label {
+                font-size: 0.9rem;
+                letter-spacing: 2px;
+            }
+            
+            .target-date {
+                font-size: 1rem;
+                padding-top: 1rem;
+            }
+        }
+
+        /* Simple flicker effect only on numbers */
+        .time-value {
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">SAP DEN TET ROI!</h1>
+    
+    <div class="countdown-container">
+        <div class="time-unit">
+            <div class="time-value" id="days">000</div>
+            <div class="time-label">Days</div>
+        </div>
+        
+        <div class="separator">:</div>
+        
+        <div class="time-unit">
+            <div class="time-value" id="hours">00</div>
+            <div class="time-label">Hours</div>
+        </div>
+        
+        <div class="separator">:</div>
+        
+        <div class="time-unit">
+            <div class="time-value" id="minutes">00</div>
+            <div class="time-label">Minutes</div>
+        </div>
+        
+        <div class="separator">:</div>
+        
+        <div class="time-unit">
+            <div class="time-value" id="seconds">00</div>
+            <div class="time-label">Seconds</div>
+        </div>
+    </div>
+    
+    <div class="target-date">
+        19 DECEMBER 2025, 00:00:00 (VIETNAM TIME - UTC+7)
+    </div>
+
+    <script>
+        // Set the target date for December 19, 2025, 00:00:00 Vietnam Time (UTC+7)
+        // December 19, 2025 at 00:00:00 UTC+7 is December 18, 2025 at 17:00:00 UTC
+        const targetDate = new Date('2025-12-18T17:00:00Z');
+        
+        // Function to update the countdown
+        function updateCountdown() {
+            const now = new Date();
+            const difference = targetDate.getTime() - now.getTime();
+            
+            // If the countdown is over
+            if (difference <= 0) {
+                document.getElementById('days').textContent = '000';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                document.querySelector('.title').textContent = 'TARGET DATE REACHED';
+                return;
+            }
+            
+            // Calculate days, hours, minutes, seconds
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            
+            // Update the display with leading zeros
+            document.getElementById('days').textContent = days.toString().padStart(3, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+        
+        // Initial call to set the countdown immediately
+        updateCountdown();
+        
+        // Update the countdown every second
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
