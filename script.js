@@ -5,7 +5,7 @@ var loopCheckbox;
 var loopPlaylistCheckbox;
 
 import { fetchButtonData } from "./utils/scaffold.js";
-
+/*
 document.getElementById("test2").addEventListener("click", ()=>{
   fetchButtonData().then(data=>{
     data.forEach(item=>{
@@ -24,10 +24,26 @@ document.getElementById("test2").addEventListener("click", ()=>{
       if (url && start && end) {
         const id = url.split("v=")[1];
         videos.push({ id, start: parseInt(start), end: parseInt(end), desc });
-      }*/
+      }*//*
     });
   });
-});
+});*/
+
+fetchButtonData().then(data=>{
+    data.forEach(item=>{
+      const [url, start, end, desc] = item.split(",");
+      createNewButton(desc);
+
+      document.getElementById(desc).addEventListener("click", () => {
+        if (url && start && end) {
+          const id = url.split("v=")[1];
+          videos.push({ id, start: parseInt(start), end: parseInt(end) });
+          onYouTubeIframeAPIReady();
+        }
+        
+      });
+    });
+  });
 
 function createNewButton(buttonName) {
     // 1. Get the container element where the new button will go
@@ -160,6 +176,7 @@ document.getElementById("playButton").addEventListener("click", () => {
 
   // Initialize the YouTube Player after loading the videos
   if (videos.length > 0) {
+    shuffleArray(videos);
     onYouTubeIframeAPIReady();
   }
 });
