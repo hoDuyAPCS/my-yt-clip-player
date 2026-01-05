@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Minimalist Todo</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --accent: #6c5ce7;
+            --danger: #ff7675;
+            --border: #dfe6e9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding-top: 100px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        button#add-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        button#add-btn:hover {
+            opacity: 0.9;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bg);
+            animation: fadeIn 0.3s ease;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .todo-text {
+            flex: 1;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .completed .todo-text {
+            text-decoration: line-through;
+            color: #b2bec3;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        li:hover .delete-btn {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Tasks</h2>
+    <div class="input-group">
+        <input type="text" id="todo-input" placeholder="What needs to be done?">
+        <button id="add-btn">Add</button>
+    </div>
+    <ul id="todo-list"></ul>
+</div>
+
+<script>
+    const input = document.getElementById('todo-input');
+    const addBtn = document.getElementById('add-btn');
+    const todoList = document.getElementById('todo-list');
+
+    // Load data from LocalStorage on startup
+    let todos = JSON.parse(localStorage.getItem('my-minimal-todos')) || [];
+
+    function saveAndRender() {
+        localStorage.setItem('my-minimal-todos', JSON.stringify(todos));
+        render();
+    }
+
+    function render() {
+        todoList.innerHTML = '';
+        todos.forEach((todo, index) => {
+            const li = document.createElement('li');
+            li.className = todo.completed ? 'completed' : '';
+            
+            li.innerHTML = `
+                <span class="todo-text" onclick="toggleTodo(${index})">${todo.text}</span>
+                <button class="delete-btn" onclick="deleteTodo(${index})">Delete</button>
+            `;
+            todoList.appendChild(li);
+        });
+    }
+
+    function addTodo() {
+        const text = input.value.trim();
+        if (text) {
+            todos.push({ text, completed: false });
+            input.value = '';
+            saveAndRender();
+        }
+    }
+
+    function toggleTodo(index) {
+        todos[index].completed = !todos[index].completed;
+        saveAndRender();
+    }
+
+    function deleteTodo(index) {
+        todos.splice(index, 1);
+        saveAndRender();
+    }
+
+    addBtn.addEventListener('click', addTodo);
+
+    // Allow pressing "Enter" to add
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTodo();
+    });
+
+    // Initial render
+    render();
+</script>
+
+</body>
+</html>
