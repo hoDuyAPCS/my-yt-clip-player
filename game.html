@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONOCHROME // ERRATIC</title>
+    <style>
+        :root { --bg: #000; --fg: #fff; }
+        body { margin: 0; background: var(--bg); color: var(--fg); font-family: 'Courier New', monospace; overflow: hidden; cursor: crosshair; }
+        #ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; letter-spacing: 3px; z-index: 5; }
+        canvas { display: block; }
+        #menu { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; border: 1px solid var(--fg); padding: 50px; background: var(--bg); z-index: 10; }
+        button { background: var(--bg); color: var(--fg); border: 1px solid var(--fg); padding: 10px 20px; cursor: pointer; text-transform: uppercase; margin-top: 20px; }
+        button:hover { background: var(--fg); color: var(--bg); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="ui">
+        <div>SCORE: <span id="score">0</span></div>
+        <div>STABILITY: <span id="timer">60</span>s</div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="menu">
+        <h1 id="title">VOID TRAINER</h1>
+        <p id="desc">ERRATIC TARGETING INITIALIZED</p>
+        <button id="startBtn">START</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const timerEl = document.getElementById('timer');
+        const menu = document.getElementById('menu');
+        const startBtn = document.getElementById('startBtn');
+
+        let width, height, score, timeLeft, gameRunning, targets = [];
+        
+        // --- DIFFICULTY TUNING ---
+        const TARGET_COUNT = 10;
+        const MIN_RADIUS = 4;   // Very small
+        const MAX_RADIUS = 12;  // Small
+        const BASE_SPEED = 5;
+        const AGGRESSION = 0.03; // Chance (3%) per frame to change direction
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Target {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.radius = Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
+                this.x = Math.random() * (width - this.radius * 2) + this.radius;
+                this.y = Math.random() * (height - this.radius * 2) + this.radius;
+                this.setRandomVelocity();
+                this.isAlive = true;
+            }
+
+            setRandomVelocity() {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * BASE_SPEED + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+            }
+
+            update() {
+                // 1. Erratic Direction Shifts (The "Unpredictability" factor)
+                if (Math.random() < AGGRESSION) {
+                    this.setRandomVelocity();
+                }
+
+                // 2. Micro-Jitter (Simulates micro-strafing)
+                this.x += this.vx + (Math.random() - 0.5) * 2;
+                this.y += this.vy + (Math.random() - 0.5) * 2;
+
+                // 3. Wall Bouncing
+                if (this.x - this.radius < 0 || this.x + this.radius > width) this.vx *= -1;
+                if (this.y - this.radius < 0 || this.y + this.radius > height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "white";
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        function animate() {
+            if (!gameRunning) return;
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, width, height);
+
+            while (targets.length < TARGET_COUNT) targets.push(new Target());
+
+            targets.forEach((t, i) => {
+                t.update();
+                t.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (!gameRunning) return;
+            for (let i = targets.length - 1; i >= 0; i--) {
+                const dist = Math.hypot(e.clientX - targets[i].x, e.clientY - targets[i].y);
+                if (dist < targets[i].radius + 5) { // +5 for slightly more forgiving hitbox on tiny targets
+                    targets.splice(i, 1);
+                    score++;
+                    scoreEl.textContent = score;
+                    break;
+                }
+            }
+        });
+
+        function startGame() {
+            score = 0;
+            timeLeft = 60;
+            gameRunning = true;
+            targets = [];
+            scoreEl.textContent = score;
+            menu.classList.add('hidden');
+            
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+
+            animate();
+        }
+
+        function endGame() {
+            gameRunning = false;
+            menu.classList.remove('hidden');
+            document.getElementById('title').textContent = "SESSION END";
+            document.getElementById('desc').textContent = `SCORE: ${score}`;
+            startBtn.textContent = "RETRY";
+        }
+
+        startBtn.addEventListener('click', startGame);
+    </script>
+</body>
+</html>
