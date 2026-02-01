@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Legion Go Crash & Heat Analyzer v3</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { margin-top: 0; color: #2c3e50; text-align: center; }
+        .controls { margin-bottom: 20px; padding: 20px; background: #e9ecef; border-radius: 8px; display: flex; gap: 20px; flex-wrap: wrap;}
+        .file-upload { flex: 1; }
+        .slider-container { flex: 1; display: flex; flex-direction: column; }
+        .chart-box { margin-bottom: 30px; border: 1px solid #eee; padding: 10px; border-radius: 8px; }
+        canvas { max-height: 400px; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Legion Go Diagnostic Tool (SoC Edition)</h1>
+    
+    <div class="controls">
+        <div class="file-upload">
+            <strong>1. Upload Log:</strong>
+            <input type="file" id="uploadCsv" accept=".csv">
+            <span id="status" style="margin-left:10px; font-weight:bold;">Waiting for file...</span>
+        </div>
+        
+        <div class="slider-container">
+            <strong>2. Zoom (Last N Frames):</strong>
+            <input type="range" id="zoomSlider" min="50" max="2000" value="300" step="50">
+            <span id="zoomValue">Showing last 300 samples</span>
+        </div>
+    </div>
+
+    <div class="chart-box">
+        <h2>⚡ Power Drop (Watch for CPU dropping below 8W)</h2>
+        <canvas id="powerChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+        <h2>🔥 Link Heat Proxies (SoC & Drive)</h2>
+        <canvas id="tempChart"></canvas>
+    </div>
+</div>
+
+<script>
+    const statusDisplay = document.getElementById('status');
+    const zoomSlider = document.getElementById('zoomSlider');
+    const zoomValue = document.getElementById('zoomValue');
+    
+    let rawData = [];
+    let powerChartInstance = null;
+    let tempChartInstance = null;
+
+    document.getElementById('uploadCsv').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        statusDisplay.textContent = "Reading file...";
+        Papa.parse(file, {
+            header: true, dynamicTyping: true, skipEmptyLines: true,
+            complete: function(results) {
+                rawData = results.data;
+                statusDisplay.textContent = `Loaded ${rawData.length} rows.`;
+                zoomSlider.max = rawData.length;
+                zoomSlider.value = Math.min(300, rawData.length);
+                updateCharts();
+            }
+        });
+    });
+
+    zoomSlider.addEventListener('input', function(e) {
+        zoomValue.textContent = `Showing last ${e.target.value} samples`;
+        updateCharts();
+    });
+
+    function updateCharts() {
+        if (!rawData || rawData.length === 0) return;
+        const sliceSize = parseInt(zoomSlider.value);
+        const slicedData = rawData.slice(-sliceSize); 
+        const keys = Object.keys(slicedData[0]);
+
+        // --- SMART COLUMN SEARCH ---
+        // Power
+        const cpuPwrKey = keys.find(k => k.includes("CPU Package Power") || k.includes("CPU Power"));
+        const gpuPwrKey = keys.find(k => k.includes("GPU Power") || k.includes("GPU ASIC Power"));
+        
+        // Heat - SPECIFICALLY searching for SoC and Drive 2
+        const socKey = keys.find(k => k.includes("CPU SOC") || k.includes("SoC Temperature"));
+        const driveKey = keys.find(k => k.includes("Drive Temperature") || k.includes("Assembly Temperature"));
+        // Try to find Drive 2, if not found, use Drive 1
+        const drive2Key = keys.find(k => k.includes("Drive Temperature 2")) || driveKey;
+
+        // Extract Data
+        const labels = slicedData.map((_, i) => i);
+        const cpuPwr = slicedData.map(r => r[cpuPwrKey]);
+        const gpuPwr = slicedData.map(r => r[gpuPwrKey]);
+        
+        const socTemp = slicedData.map(r => r[socKey]);
+        const driveTemp = slicedData.map(r => r[drive2Key]);
+
+        // --- CHART 1: POWER ---
+        if (powerChartInstance) powerChartInstance.destroy();
+        powerChartInstance = new Chart(document.getElementById('powerChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'CPU Power (W)', data: cpuPwr, borderColor: '#2980b9', backgroundColor: 'rgba(41, 128, 185, 0.1)', borderWidth: 2, fill: true, pointRadius: 0 },
+                    { label: 'GPU Power (W)', data: gpuPwr, borderColor: '#27ae60', borderWidth: 2, pointRadius: 0 }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                scales: { x: { display: false }, y: { title: { display: true, text: 'Watts' }, min: 0 } }
+            }
+        });
+
+        // --- CHART 2: HEAT (SoC & Drive) ---
+        if (tempChartInstance) tempChartInstance.destroy();
+        tempChartInstance = new Chart(document.getElementById('tempChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { 
+                        label: 'SoC Temp (Controller)', 
+                        data: socTemp, 
+                        borderColor: '#8e44ad', // Purple
+                        borderWidth: 2, 
+                        pointRadius: 0 
+                    },
+                    { 
+                        label: 'Drive Temp (Link Proxy)', 
+                        data: driveTemp, 
+                        borderColor: '#c0392b', // Red
+                        borderWidth: 2, 
+                        pointRadius: 0 
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                scales: { x: { display: false }, y: { title: { display: true, text: 'Temp (°C)' }, min: 30, max: 90 } }
+            }
+        });
+    }
+</script>
+</body>
+</html>
